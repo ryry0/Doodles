@@ -1,59 +1,52 @@
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
-
+import Random
 
 main =
-  Html.beginnerProgram { model = model, view = view, update = update }
+  Html.program
+    { init = init
+    , view = view
+    , update = update
+    , subscriptions = subscriptions
+    }
 
 -- Model
 type alias Model =
-  { name : String
-  , password : String
-  , passwordAgain : String
+  { dieFace : Int
   }
-
-model : Model
-model =
-  Model "" "" ""
 
 -- Update
 
 type Msg
-  = Name String
-  | Password String
-  | PasswordAgain String
+  = Roll
+  | NewFace Int
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
-    Name name ->
-      { model | name = name }
+    Roll ->
+      (model, Random.generate NewFace (Random.int 1 6))
 
-    Password password ->
-      { model | password = password }
-
-    PasswordAgain passwordAgain ->
-      { model | passwordAgain = passwordAgain }
+    NewFace newFace ->
+      (Model newFace, Cmd.none)
 
 -- View
 
 view : Model -> Html Msg
 view model =
   div []
-  [ input [ type_ "text", placeholder "Name", onInput Name ] []
-  , input [ type_ "password", placeholder "Password", onInput Password ] []
-  , input [ type_ "password", placeholder "Re-enter Password", onInput PasswordAgain ] []
-  , viewValidation model
+  [ h1 [] [ text (toString model.dieFace ) ]
+  , button [onClick Roll ] [ text "Roll"]
   ]
 
-viewValidation : Model -> Html msg
-viewValidation model =
-  let
-      (color, message) =
-        if model.password == model.passwordAgain then
-           ("green", "OK")
-         else
-           ("red", "Passwords no match")
-  in
-     div [ style [("color", color)] ] [ text message ]
+-- Subscriptions
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+  Sub.none
+
+-- Init
+init : (Model, Cmd Msg)
+init =
+  (Model 1, Cmd.none)

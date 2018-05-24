@@ -1,76 +1,73 @@
 import Html exposing (..)
-import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Http
 import Json.Decode as Decode
 import Random
+import Svg exposing (..)
+import Svg.Attributes exposing (..)
+import Time exposing (Time, second)
 
 main =
   Html.program
-    { init = init "clouds"
+    { init = init
     , view = view
     , update = update
     , subscriptions = subscriptions
     }
 
 -- Model
-type alias Model =
-  { topic : String
-  , gifUrl : String
-  }
-
+type alias Model = Time
 
 -- Init
 
-init : String -> (Model, Cmd Msg)
-init topic =
-  (Model topic "waiting.gif", getRandomGif topic)
+init : (Model, Cmd Msg)
+init =
+  (0, Cmd.none)
 
 -- Update
 
 type Msg
-  = Fetch
-  | NewGif (Result Http.Error String)
+  = Tick Time
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
-    Fetch ->
-      (model, getRandomGif model.topic)
-
-    NewGif (Ok newUrl) ->
-      ( { model | gifUrl = newUrl }, Cmd.none )
-
-    NewGif (Err _) ->
-      (model, Cmd.none)
-
-getRandomGif : String -> Cmd Msg
-getRandomGif topic =
-  let
-      url =
-        "https://api.giphy.com/v1/gifs/random?api_key=dc6zaTOxFJmzC&tag=" ++ topic
-
-      request =
-        Http.get url decodeGifUrl
-  in
-     Http.send NewGif request
-
-decodeGifUrl : Decode.Decoder String
-decodeGifUrl =
-  Decode.at ["data", "image_url"] Decode.string
-
--- View
-
-view : Model -> Html Msg
-view model =
-  div []
-  [ h2 [] [ text (toString model.topic ) ]
-  , img [ src model.gifUrl ] []
-  , button [ onClick Fetch ] [ text "Fetch" ]
-  ]
+    Tick newTime ->
+      (newTime, Cmd.none)
 
 -- Subscriptions
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  Sub.none
+  Time.every second Tick
+
+-- View
+
+view : Model -> Html Msg
+view model =
+  let
+      angle =
+        turns (Time.inMinutes model)
+
+      handX =
+        toString (50 + 40 * cos angle)
+
+      handY =
+        toString (50 + 40 * sin angle)
+  in
+     svg [ viewBox "0 0 100 100", width "300px" ]
+      [ circle [ cx "50", cy "50", r "45", fill "#0B79CE" ] []
+      , line [ x1 "50", y1 "50", x2 handX, y2 handY, stroke "#023963" ] []
+      ]
+
+fragmentShader : Shader {} {} { vcolor : Vec3 }
+fragmentShader =
+  [glsl|
+
+    precision mediump float;
+    varying vec3 vcolor;
+
+    void main() {
+      gl_Fragcolor = vec4(vcolor, 1.0);
+    }
+  |]

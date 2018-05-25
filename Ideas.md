@@ -21,3 +21,4 @@ Some ideas that may be interesting to implement
 * watercolor simulator
 * lisp interpreter
 * fft
+* Four bar linkage.

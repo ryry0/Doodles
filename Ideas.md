@@ -20,3 +20,4 @@ Some ideas that may be interesting to implement
 * quantum computer simulator
 * watercolor simulator
 * lisp interpreter
+* fft

@@ -9,6 +9,7 @@ import Math.Matrix4 exposing (..)
 import AnimationFrame
 import WebGL exposing (..)
 import Time exposing (Time)
+import Window
 
 
 main =
@@ -53,6 +54,10 @@ type alias Model =
     --, initial_point : (Float, Float, Float)
     }
 
+
+windowSizeToResolution : Window.Size -> Msg
+windowSizeToResolution windowsize =
+  Resolution (windowsize.width, windowsize.height)
 
 
 -- Init
@@ -565,8 +570,9 @@ update action model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    AnimationFrame.diffs DeltaTime
-
+    Sub.batch [ AnimationFrame.diffs DeltaTime
+              , Window.resizes windowSizeToResolution
+              ]
 
 
 -- View

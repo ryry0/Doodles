@@ -19,8 +19,6 @@ main =
         , subscriptions = subscriptions
         }
 
-
-
 -- Model
 
 
@@ -34,15 +32,15 @@ type alias Attractor =
     Float -> Float -> Float -> ( Float, Float, Float )
 
 
-type AttractorType
-    = Thomas
-    | Lorenz
-    | Aizawa
-    | Anishchenko
-    | Bouali
-    | Coullet
-    | Yu
-
+attractorlist : List String
+attractorlist =
+    [ "Thomas"
+    , "Lorenz"
+    , "Aizawa"
+    , "Anishchenko"
+    , "Bouali"
+    , "Coullet"
+    , "Yu" ]
 
 type alias Model =
     { renderable : List Vertex
@@ -457,34 +455,15 @@ yu_wang x y z =
 
 
 type Msg
-    = Reset Bool
-    | Select AttractorType
+    = Reset
+    | Select String
     | Resolution ( Int, Int )
     | DeltaTime Time
 
 
-
-{--
-resetbuttonaction : Signal.Mailbox Bool
-resetbuttonaction =
-    Signal.mailbox False
-
-
-dropdownaction : Signal.Mailbox AttractorType
-dropdownaction =
-    Signal.mailbox Thomas
-
-
-action : Signal Action
-action =
-    Signal.mergeMany
-        [ Signal.map Reset resetbuttonaction.signal
-        , Signal.map Select dropdownaction.signal
-        , Signal.map Resolution Window.dimensions
-        , Signal.map DeltaTime <| fps 30
-        ]
-        --}
-
+attractorOption : String -> Html Msg
+attractorOption item =
+  option [ Html.Attributes.value item ] [ text item ]
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update action model =
@@ -493,66 +472,69 @@ update action model =
             let
                 finalModel =
                     case attractor of
-                        Thomas ->
+                        "Thomas" ->
                             { model
                                 | renderable = [ initialpoint ]
                                 , scale = 0.08
                                 , attractor = thomas
                             }
 
-                        Lorenz ->
+                        "Lorenz" ->
                             { model
                                 | renderable = [ genvertex -1.1 0 0 ]
                                 , scale = 0.01
                                 , attractor = lorenz
                             }
 
-                        Aizawa ->
+                        "Aizawa" ->
                             { model
                                 | renderable = [ genvertex -1.1 0 0 ]
                                 , scale = 0.2
                                 , attractor = aizawa
                             }
 
-                        Anishchenko ->
+                        "Anishchenko" ->
                             { model
                                 | renderable = [ genvertex 0.1 0.0 0.0 ]
                                 , scale = 0.05
                                 , attractor = anishchenko_astakhov
                             }
 
-                        Bouali ->
+                        "Bouali" ->
                             { model
                                 | renderable = [ genvertex -1.1 1.0 0.0 ]
                                 , scale = 0.03
                                 , attractor = bouali
                             }
 
-                        Coullet ->
+                        "Coullet" ->
                             { model
                                 | renderable = [ genvertex 0.1 0.1 0.1 ]
                                 , scale = 0.1
                                 , attractor = coullet
                             }
 
-                        Yu ->
+                        "Yu" ->
                             { model
                                 | renderable = [ genvertex 1.1 1.1 1.1 ]
                                 , scale = 0.008
                                 , attractor = yu_wang
                             }
+                        _ ->
+                            { model
+                                | renderable = [ initialpoint ]
+                                , scale = 0.08
+                                , attractor = thomas
+                            }
             in
                 ( finalModel, Cmd.none )
 
-        Reset state ->
+        Reset ->
             let
                 finalModel =
-                    if state then
                         { model
                             | renderable = [ initialpoint ]
                         }
-                    else
-                        model
             in
                 ( finalModel, Cmd.none )
 
@@ -588,22 +570,6 @@ subscriptions model =
 
 
 -- View
-{--
-
-dropdown : Html msg
-dropdown =
-    Graphics.Input.dropDown (Signal.message dropdownaction.address)
-        [ ( "Thomas", Thomas )
-        , ( "Lorenz", Lorenz )
-        , ( "Aizawa", Aizawa )
-        , ( "Anishchenko Astakhov", Anishchenko )
-        , ( "Bouali", Bouali )
-        , ( "Coullet", Coullet )
-        , ( "Yu Wang", Yu )
-        ]
-
---}
-
 
 glview : Model -> Html Msg
 glview model =
@@ -629,7 +595,11 @@ glview model =
 view : Model -> Html Msg
 view model =
     div []
-        [ glview model ]
+        [ select [ onInput Select ]
+          (List.map attractorOption attractorlist )
+        , button [ onClick Reset ] [ text "Reset" ]
+        , glview model
+        ]
 
 
 

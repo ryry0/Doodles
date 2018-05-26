@@ -20,6 +20,8 @@ main =
         , subscriptions = subscriptions
         }
 
+
+
 -- Model
 
 
@@ -41,7 +43,9 @@ attractorlist =
     , "Anishchenko"
     , "Bouali"
     , "Coullet"
-    , "Yu" ]
+    , "Yu"
+    ]
+
 
 type alias Model =
     { renderable : List Vertex
@@ -57,7 +61,8 @@ type alias Model =
 
 windowSizeToResolution : Window.Size -> Msg
 windowSizeToResolution windowsize =
-  Resolution (windowsize.width, windowsize.height)
+    Resolution ( windowsize.width, windowsize.height )
+
 
 
 -- Init
@@ -468,7 +473,8 @@ type Msg
 
 attractorOption : String -> Html Msg
 attractorOption item =
-  option [ Html.Attributes.value item ] [ text item ]
+    option [ Html.Attributes.value item ] [ text item ]
+
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update action model =
@@ -525,6 +531,7 @@ update action model =
                                 , scale = 0.008
                                 , attractor = yu_wang
                             }
+
                         _ ->
                             { model
                                 | renderable = [ initialpoint ]
@@ -537,9 +544,9 @@ update action model =
         Reset ->
             let
                 finalModel =
-                        { model
-                            | renderable = [ initialpoint ]
-                        }
+                    { model
+                        | renderable = [ initialpoint ]
+                    }
             in
                 ( finalModel, Cmd.none )
 
@@ -570,12 +577,15 @@ update action model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.batch [ AnimationFrame.diffs DeltaTime
-              , Window.resizes windowSizeToResolution
-              ]
+    Sub.batch
+        [ AnimationFrame.diffs DeltaTime
+        , Window.resizes windowSizeToResolution
+        ]
+
 
 
 -- View
+
 
 glview : Model -> Html Msg
 glview model =
@@ -602,7 +612,7 @@ view : Model -> Html Msg
 view model =
     div []
         [ select [ onInput Select ]
-          (List.map attractorOption attractorlist )
+            (List.map attractorOption attractorlist)
         , button [ onClick Reset ] [ text "Reset" ]
         , glview model
         ]

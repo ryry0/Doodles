@@ -22,3 +22,10 @@ Some ideas that may be interesting to implement
 * lisp interpreter
 * fft
 * Four bar linkage.
+* homoiconic template language for writing provably correct, fast numerical
+  simulations. A focus on building stuff, not the overhead of learning
+  programming language theory or fighting the compiler. Really helpful debug
+  messages. Memory management? Easy hooking into plotting software,
+  parallelization, and 3d visualization. Embellished functions to keep track of
+  intermediate things? Have the compiler enforce correct multiplications?
+* doodle viewer -> see a doodle upper bar, pull out drawer.

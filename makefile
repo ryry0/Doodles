@@ -2,13 +2,13 @@
 SOURCE_EXT=elm
 
 # Files
-SOURCES=$(wildcard *.$(SOURCE_EXT))
+SOURCES=src/mainpage.elm
 
-all: 
-	elm-make $(SOURCES)
+all:
+	elm make $(SOURCES) --output=index.html
 
 format:
 	elm-format $(SOURCES)
 
 reactor:
-	elm-reactor -a 0.0.0.0
+	elm reactor

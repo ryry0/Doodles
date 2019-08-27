@@ -1,19 +1,18 @@
 module Main exposing (..)
 
-import Html exposing (..)
+import Browser
+import Browser.Events
+import Html exposing (div, input, text, select, button, option)
 import Html.Attributes exposing (width, height, style)
 import Html.Events exposing (onClick, onInput)
 import Math.Vector3 exposing (..)
 import Math.Vector2 exposing (..)
 import Math.Matrix4 exposing (..)
-import AnimationFrame
 import WebGL exposing (..)
-import Time exposing (Time)
-import Window
 
 
 main =
-    Html.program
+    Browser.element
         { init = init
         , view = view
         , update = update
@@ -59,17 +58,17 @@ type alias Model =
     }
 
 
-windowSizeToResolution : Window.Size -> Msg
-windowSizeToResolution windowsize =
-    Resolution ( windowsize.width, windowsize.height )
+windowSizeToResolution : Int -> Int -> Msg
+windowSizeToResolution width height =
+    Resolution ( width, height )
 
 
 
 -- Init
 
 
-init : ( Model, Cmd Msg )
-init =
+init : () -> ( Model, Cmd Msg )
+init _ =
     let
         model =
             { renderable = [ initialpoint ]
@@ -468,10 +467,10 @@ type Msg
     = Reset
     | Select String
     | Resolution ( Int, Int )
-    | DeltaTime Time
+    | DeltaTime Float
 
 
-attractorOption : String -> Html Msg
+attractorOption : String -> Html.Html Msg
 attractorOption item =
     option [ Html.Attributes.value item ] [ text item ]
 
@@ -578,8 +577,8 @@ update action model =
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
-        [ AnimationFrame.diffs DeltaTime
-        , Window.resizes windowSizeToResolution
+        [ Browser.Events.onAnimationFrameDelta DeltaTime
+        , Browser.Events.onResize windowSizeToResolution
         ]
 
 
@@ -587,12 +586,12 @@ subscriptions model =
 -- View
 
 
-glview : Model -> Html Msg
+glview : Model -> Html.Html Msg
 glview model =
     WebGL.toHtml
         [ width (Tuple.first model.resolution)
         , height (Tuple.second model.resolution)
-        , style [ ( "display", "block" ) ]
+        , style "display" "block"
         ]
         [ WebGL.entity
             vertexShader
@@ -608,7 +607,7 @@ glview model =
         ]
 
 
-view : Model -> Html Msg
+view : Model -> Html.Html Msg
 view model =
     div []
         [ select [ onInput Select ]

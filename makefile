@@ -2,7 +2,7 @@
 SOURCE_EXT=elm
 
 # Files
-SOURCES=src/mainpage.elm
+SOURCES=src/Main.elm
 
 all:
 	elm make $(SOURCES) --output=index.html
